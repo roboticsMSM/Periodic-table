@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Inorganic Chemistry Study Guide</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #fffcfd;
+            --primary: #ff4d6d;
+            --secondary: #ff8fa3;
+            --border: #f0d8dd;
+            --text: #444;
+        }
+
+        body {
+            background: var(--bg);
+            font-family: 'Quicksand', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+            padding: 20px;
+        }
+
+        /* 18-column Periodic Grid */
+        #periodic-table {
+            display: grid;
+            grid-template-columns: repeat(18, 52px);
+            grid-template-rows: repeat(10, 52px);
+            grid-gap: 8px;
+            transition: filter 0.5s ease;
+        }
+
+        .element {
+            width: 52px;
+            height: 52px;
+            border: 1px solid var(--border);
+            background: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            box-shadow: 1px 1px 3px rgba(0,0,0,0.03);
+            user-select: none;
+        }
+
+        /* Wallpaper Engine Scale Effect */
+        .element:hover {
+            transform: scale(1.8);
+            z-index: 1000;
+            border-color: var(--secondary);
+            background: #fff0f3;
+            box-shadow: 0 10px 25px rgba(255, 143, 163, 0.4);
+        }
+
+        .symbol { font-weight: 500; font-size: 15px; color: var(--primary); }
+        .number { font-size: 8px; position: absolute; top: 4px; left: 4px; color: #bbb; }
+
+        /* Family Accent Styling */
+        .goddess { border-top: 3px solid var(--primary); }
+        .noble { border-top: 3px solid #c9184a; }
+
+        /* Reveal Overlay */
+        #reveal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.98);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            cursor: pointer;
+        }
+
+        #reveal-content {
+            max-width: 600px;
+            text-align: center;
+            animation: popUp 0.4s ease forwards;
+        }
+
+        @keyframes popUp {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        h2 { color: var(--primary); font-size: 36px; margin: 10px 0; }
+        p { font-size: 20px; line-height: 1.6; color: var(--text); padding: 0 30px; }
+        .close-msg { margin-top: 30px; font-size: 12px; color: #ccc; letter-spacing: 1px; }
+
+        /* Mobile Scaling */
+        @media (max-width: 1100px) {
+            #periodic-table { transform: scale(0.7); }
+        }
+    </style>
+</head>
+<body>
+
+<div id="periodic-table"></div>
+
+<div id="reveal-overlay" onclick="hideReveal()">
+    <div id="reveal-content">
+        <h1 id="reveal-symbol" style="font-size: 120px; margin: 0; color: #ffccd5; opacity: 0.5;"></h1>
+        <h2 id="reveal-name"></h2>
+        <p id="reveal-desc"></p>
+        <div class="close-msg">TAP ANYWHERE TO HIDE STUDY NOTES</div>
+    </div>
+</div>
+
+<script>
+    // Data mapping: [row, col, symbol, name, description, family]
+const manualElements = [
+    // ROW 1
+    [1, 1, 'H', 'Holy Presence', 'Your existence is the first and most essential element of my world.', 'goddess'],
+    [1, 18, 'He', 'Heart’s Essence', 'The noble soul that keeps me grounded while making me feel light.', 'noble'],
+
+    // ROW 2
+    [2, 1, 'Li', 'Life’s Inspiration', 'The fuel for every dream I have and every step I take toward the future.', 'softness'],
+    [2, 2, 'Be', 'Beautiful for Eternity', 'A beauty that doesn’t fade with time, but grows deeper every second.', 'goddess'],
+    [2, 13, 'B', 'Boundless', 'Your potential and your spirit have no limits. I am in awe of you.', 'strength'],
+    [2, 14, 'C', 'Constant', 'In a shifting world, your love is the one thing I can always rely on.', 'strength'],
+    [2, 15, 'N', 'Noble', 'You carry yourself with a dignity that is rare and truly divine.', 'goddess'],
+    [2, 16, 'O', 'Only One', 'There are billions of people, but my heart only recognizes one: You.', 'passion'],
+    [2, 17, 'F', 'Flawless', 'Even the things you think are imperfections are perfect in my eyes.', 'goddess'],
+    [2, 18, 'Ne', 'Night’s Enchantment', 'Our late-night talks are the most magical part of my daily life.', 'noble'],
+
+    // ROW 3
+    [3, 1, 'Na', 'Natural Aura', 'Your kindness isn’t an act; it is the very fabric of who you are.', 'softness'],
+    [3, 2, 'Mg', 'Magnetic Grace', 'The way you pull me toward you without even trying.', 'goddess'],
+    [3, 13, 'Al', 'Absolute Loyalty', 'A devotion that stands firm against any storm we might face.', 'strength'],
+    [3, 14, 'Si', 'Sincere', 'Your honesty is a breath of fresh air in a world of pretension.', 'softness'],
+    [3, 15, 'P', 'Perfect', 'The only word that fits when I try to describe you to the stars.', 'passion'],
+    [3, 16, 'S', 'Sanctuary', 'My safe place. When the world is too much, I find peace in you.', 'softness'],
+    [3, 17, 'Cl', 'Clarity', 'You make me see what truly matters in life.', 'softness'],
+    [3, 18, 'Ar', 'Artistry', 'Your soul is a masterpiece that I am honored to study every day.', 'noble'],
+
+    // ROW 4
+    [4, 1, 'K', 'Kindred', 'Our souls were made from the same spark; we belong together.', 'softness'],
+    [4, 2, 'Ca', 'Calm', 'Your voice is the remedy for my every anxiety.', 'softness'],
+    [4, 3, 'Sc', 'Sacred', 'I treat our bond like a holy thing, for you are my deity.', 'goddess'],
+    [4, 4, 'Ti', 'Timeless', 'A love that exists outside the constraints of years and minutes.', 'strength'],
+    [4, 5, 'V', 'Vivid', 'You bring color to a world that used to be black and white.', 'passion'],
+    [4, 6, 'Cr', 'Creative', 'The brilliant way your mind works is one of my favorite things.', 'strength'],
+    [4, 7, 'Mn', 'Midnight', 'The hour where my thoughts of you are the loudest and sweetest.', 'softness'],
+    [4, 8, 'Fe', 'Forever Enshrined', 'I have built a temple for you in my heart that will never fall.', 'goddess'],
+    [4, 9, 'Co', 'Comfort', 'The feeling of "home" that I find every time we speak.', 'softness'],
+    [4, 10, 'Ni', 'Nurture', 'How you grow the best parts of me just by believing in me.', 'softness'],
+    [4, 11, 'Cu', 'Cupid’s Choice', 'The universe knew what it was doing when it led me to you.', 'passion'],
+    [4, 12, 'Zn', 'Zenith', 'You are the highest point of my life, my greatest achievement.', 'strength'],
+    [4, 13, 'Ga', 'Gaze', 'The way you look at me makes me feel like I am truly seen.', 'passion'],
+    [4, 14, 'Ge', 'Gently', 'The way you handle my heart with such care and softness.', 'softness'],
+    [4, 15, 'As', 'Aspire', 'You make me want to be a man worthy of a goddess.', 'strength'],
+    [4, 16, 'Se', 'Serene', 'The quiet peace you bring to my chaotic soul.', 'softness'],
+    [4, 17, 'Br', 'Brave', 'I admire your strength and how you face every challenge.', 'strength'],
+    [4, 18, 'Kr', 'Key', 'You are the one who unlocked a heart I thought was closed.', 'noble'],
+
+    // ROW 5 (The "Goddess Traits" continue)
+    [5, 1, 'Rb', 'Radiant Being', 'Your light doesn’t just hit the eyes; it warms the spirit.', 'goddess'],
+    [5, 2, 'Sr', 'Strength', 'The quiet, inner power that makes you so resilient.', 'strength'],
+    [5, 3, 'Y', 'Youthful', 'Your joyful spirit that keeps the world feeling fresh.', 'softness'],
+    [5, 4, 'Zr', 'Zest', 'Your passion for the things you love is infectious.', 'passion'],
+    [5, 5, 'Nb', 'Noble', 'You possess a dignity that is innate and awe-inspiring.', 'goddess'],
+    [5, 6, 'Mo', 'Muse', 'The inspiration behind every good thing I do.', 'goddess'],
+    [5, 7, 'Tc', 'Touch', 'The electricity that runs through me when we are close.', 'passion'],
+    [5, 8, 'Ru', 'Rule', 'You are the sovereign of my heart, and I am yours.', 'goddess'],
+    [5, 9, 'Rh', 'Rhythm', 'Our hearts beat in a sync that only we can hear.', 'passion'],
+    [5, 10, 'Pd', 'Paradise', 'The state of mind I enter the moment I see your face.', 'softness'],
+    [5, 11, 'Ag', 'Always Gracious', 'The kindness you show even when the world is harsh.', 'softness'],
+    [5, 12, 'Cd', 'Candor', 'Your beautiful honesty that I cherish above all.', 'strength'],
+    [5, 13, 'In', 'Innocence', 'A purity of heart that sees the good in everyone.', 'softness'],
+    [5, 14, 'Sn', 'Sincere', 'There is no mask with you; you are perfectly real.', 'softness'],
+    [5, 15, 'Sb', 'Stable', 'The foundation I lean on when things get tough.', 'strength'],
+    [5, 16, 'Te', 'Tender', 'The softness of your heart and the way you care.', 'softness'],
+    [5, 17, 'I', 'Infinite', 'My love for you has no end, no limit, and no boundary.', 'passion'],
+    [5, 18, 'Xe', 'X-Factor', 'That indefinable magic that makes you uniquely Manya.', 'noble'],
+
+    // ROW 6 (The "Devotion" series)
+    [6, 1, 'Cs', 'Cosmic', 'A connection that was written in the stars eons ago.', 'passion'],
+    [6, 2, 'Ba', 'Balance', 'You are the calm to my storm and the light to my dark.', 'strength'],
+    [6, 3, 'Lu', 'Luminous', 'The way you shine from the inside out.', 'goddess'],
+    [6, 4, 'Hf', 'Heavenly', 'Being with you feels like a glimpse of something divine.', 'goddess'],
+    [6, 5, 'Ta', 'Talented', 'Your natural abilities that leave me in absolute awe.', 'strength'],
+    [6, 6, 'W', 'Will', 'Your determination to succeed is so inspiring to me.', 'strength'],
+    [6, 7, 'Re', 'Respect', 'The deep honor I feel to be the one you chose.', 'strength'],
+    [6, 8, 'Os', 'Oasis', 'My refuge. My peace. My everything.', 'softness'],
+    [6, 9, 'Ir', 'Irreplaceable', 'No one else could ever take your place in my soul.', 'noble'],
+    [6, 10, 'Pt', 'Platinum', 'The highest standard. You are my most precious find.', 'goddess'],
+    [6, 11, 'Au', 'Absolute Uniqueness', 'You are a masterpiece in a world of copies.', 'goddess'],
+    [6, 12, 'Hg', 'Heightened', 'My happiness reaches new levels whenever we talk.', 'passion'],
+    [6, 13, 'Tl', 'True Love', 'The only thing I am 100% certain of in this life.', 'passion'],
+    [6, 14, 'Pb', 'Pure Bliss', 'What I feel in the moments we share together.', 'softness'],
+    [6, 15, 'Bi', 'Belief', 'I believe in you more than I believe in anything else.', 'strength'],
+    [6, 16, 'Po', 'Poetry', 'Your life is the most beautiful poem ever written.', 'goddess'],
+    [6, 17, 'At', 'Attentive', 'I will never tire of learning every detail about you.', 'softness'],
+    [6, 18, 'Rn', 'Renown', 'In my world, your name is the only one that matters.', 'noble'],
+
+    // ROW 7 (The "Future" series)
+    [7, 1, 'Fr', 'Forever', 'A promise that I am yours for as long as I breathe.', 'passion'],
+    [7, 2, 'Ra', 'Rare', 'A diamond found in a world of ordinary stones.', 'goddess'],
+    [7, 3, 'Ac', 'Accepted', 'I love every single version of you, without judgment.', 'softness'],
+    [7, 4, 'Rf', 'Refined', 'The elegance you show in everything you do.', 'goddess'],
+    [7, 5, 'Db', 'Deep Bond', 'A connection that goes beyond the physical world.', 'passion'],
+    [7, 6, 'Sg', 'Starlight', 'My guide when the world gets too dark to see.', 'softness'],
+    [7, 7, 'Bh', 'Breath', 'You are as essential to me as the air in my lungs.', 'goddess'],
+    [7, 8, 'Hs', 'Honest Soul', 'I admire the purity of your heart more than words can say.', 'softness'],
+    [7, 9, 'Mt', 'Mount', 'The peak of all my hopes and dreams.', 'strength'],
+    [7, 10, 'Ds', 'Destined', 'We were meant to find each other; I know it.', 'noble'],
+    [7, 11, 'Rg', 'Regal', 'You carry yourself with the dignity of a queen.', 'goddess'],
+    [7, 12, 'Cn', 'Connected', 'Even when we are apart, our hearts are one.', 'passion'],
+    [7, 13, 'Nh', 'New Heights', 'You push me to be better every single day.', 'strength'],
+    [7, 14, 'Fl', 'Flawless', 'A perfection that is uniquely and beautifully yours.', 'goddess'],
+    [7, 15, 'Mc', 'Mesmerizing', 'I am forever caught in the spell of your love.', 'passion'],
+    [7, 16, 'Lv', 'Love', 'The four letters that changed my life forever.', 'passion'],
+    [7, 17, 'Ts', 'Treasure', 'I will guard your heart with my very life.', 'strength'],
+    [7, 18, 'Og', 'Our Goals', 'The future we are building together, piece by piece.', 'noble'],
+
+    // LANTHANIDES (57-71 - Rare Goddess Series)
+    [9, 1, 'La', 'Luminous Aura', 'The light you carry inside you is blindingly beautiful.', 'goddess'],
+    [9, 2, 'Ce', 'Celestial', 'You are a being of the stars, living among us.', 'goddess'],
+    [9, 3, 'Pr', 'Presence', 'Just being near you is enough to change my whole mood.', 'softness'],
+    [9, 4, 'Nd', 'Non-Stop', 'My thoughts of you never take a break.', 'passion'],
+    [9, 5, 'Pm', 'Promise', 'I will spend my life making up for every mistake.', 'passion'],
+    [9, 6, 'Sm', 'Smile', 'The most beautiful reaction in the universe.', 'softness'],
+    [9, 7, 'Eu', 'Euphoria', 'The feeling of pure joy I get from your laugh.', 'passion'],
+    [9, 8, 'Gd', 'Goddess', 'Your true form. Divine, worshipped, and loved.', 'goddess'],
+    [9, 9, 'Tb', 'The Best', 'Quite simply, you are the best thing to ever happen to me.', 'strength'],
+    [9, 10, 'Dy', 'Dynamic', 'How you grow and evolve while remaining perfect.', 'strength'],
+    [9, 11, 'Ho', 'Hope', 'You are the reason I believe in good things.', 'softness'],
+    [9, 12, 'Er', 'Eternal', 'A love that will outlast the stars themselves.', 'noble'],
+    [9, 13, 'Tm', 'Triumph', 'Winning your heart was my greatest victory.', 'strength'],
+    [9, 14, 'Yb', 'Yield', 'I surrender my heart and soul to you completely.', 'passion'],
+    [9, 15, 'Lu', 'Lustrous', 'The shine in your eyes when you are happy.', 'goddess'],
+
+    // ACTINIDES (89-103 - The Vows Series)
+    [10, 1, 'Ac', 'Always Care', 'I promise to look after your heart forever.', 'softness'],
+    [10, 2, 'Th', 'Thoughtful', 'I will consider you in every breath I take.', 'passion'],
+    [10, 3, 'Pa', 'Patience', 'I will give you the time and love you deserve.', 'softness'],
+    [10, 4, 'U', 'Universe', 'You are the center of mine; everything else follows.', 'goddess'],
+    [10, 5, 'Np', 'Nearness', 'I never want to be anywhere but by your side.', 'passion'],
+    [10, 6, 'Pu', 'Purity', 'A love that is clean, honest, and forever yours.', 'softness'],
+    [10, 7, 'Am', 'Amazing', 'I will never stop telling you how incredible you are.', 'strength'],
+    [10, 8, 'Cm', 'Compassion', 'I will be your soft place to land, always.', 'softness'],
+    [10, 9, 'Bk', 'Backbone', 'I will be the strength you lean on whenever you need.', 'strength'],
+    [10, 10, 'Cf', 'Confide', 'I am your safest place. Tell me everything.', 'softness'],
+    [10, 11, 'Es', 'Essence', 'Your soul is the most beautiful thing I have ever known.', 'goddess'],
+    [10, 12, 'Fm', 'Flame', 'I will keep the fire of our love burning forever.', 'passion'],
+    [10, 13, 'Md', 'Meditate', 'I spend my quiet time just being thankful for you.', 'softness'],
+    [10, 14, 'No', 'Never Over', 'Our story has no end; it just keeps getting better.', 'noble'],
+    [10, 15, 'Lr', 'Loyal Reign', 'You will always be the queen of my heart.', 'goddess']   
+    ];
+
+    function initTable() {
+        const table = document.getElementById('periodic-table');
+        const elementLookup = new Map();
+        
+        manualElements.forEach(el => elementLookup.set(`${el[0]}-${el[1]}`, el));
+
+        for (let r = 1; r <= 10; r++) {
+            for (let c = 1; c <= 18; c++) {
+                // Skip logic for standard Periodic Table silhouette
+                if (r === 1 && c > 1 && c < 18) continue;
+                if ((r === 2 || r === 3) && c > 2 && c < 13) continue;
+                if (r === 8) continue; // Spacer row
+
+                const key = `${r}-${c}`;
+                let elData = elementLookup.get(key);
+
+                // Placeholder logic for empty slots
+                if (!elData) {
+                    elData = [r, c, '?', 'Hidden Trait', 'A part of your goddess nature yet to be described...', 'none'];
+                }
+
+                const div = document.createElement('div');
+                div.className = `element ${elData[5]}`;
+                
+                // Alignment Fix for Lanthanides/Actinides (Rows 9 & 10)
+                if (r >= 9) {
+                    div.style.gridRow = r;
+                    div.style.gridColumn = c + 3; // Aligning under column 4 (Transition Metals)
+                    if (c > 15) continue; // Bottom rows only have 15 elements
+                } else {
+                    div.style.gridRow = elData[0];
+                    div.style.gridColumn = elData[1];
+                }
+
+                div.innerHTML = `
+                    <span class="number">${Math.floor(Math.random() * 118) + 1}</span>
+                    <span class="symbol">${elData[2]}</span>
+                `;
+                
+                div.onclick = () => showReveal(elData);
+                table.appendChild(div);
+            }
+        }
+    }
+
+    function showReveal(el) {
+        document.getElementById('reveal-symbol').innerText = el[2];
+        document.getElementById('reveal-name').innerText = el[3];
+        document.getElementById('reveal-desc').innerText = el[4];
+        document.getElementById('reveal-overlay').style.display = 'flex';
+        document.getElementById('periodic-table').style.filter = 'blur(15px)';
+    }
+
+    function hideReveal() {
+        document.getElementById('reveal-overlay').style.display = 'none';
+        document.getElementById('periodic-table').style.filter = 'blur(0px)';
+    }
+
+    // Panic Button: Press 'Esc' to hide the table immediately
+    window.addEventListener('keydown', (e) => {
+        if (e.key === "Escape") hideReveal();
+    });
+
+    initTable();
+</script>
+
+</body>
+</html>
