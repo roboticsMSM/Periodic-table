@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #fffcfd;
+            --bg: #ffeef2;
             --primary: #ff4d6d;
             --secondary: #ff8fa3;
             --border: #f0d8dd;
@@ -24,6 +24,8 @@
             margin: 0;
             overflow-x: hidden;
             padding: 20px;
+            overflow: hidden;
+            padding: 0;
         }
 
         /* 18-column Periodic Grid */
@@ -32,12 +34,17 @@
             grid-template-columns: repeat(18, 52px);
             grid-template-rows: repeat(10, 52px);
             grid-gap: 8px;
+            grid-template-columns: repeat(18, min(5vw, 8.5vh));
+            grid-template-rows: repeat(10, min(5vw, 8.5vh));
+            grid-gap: min(0.5vw, 0.8vh);
             transition: filter 0.5s ease;
         }
 
         .element {
             width: 52px;
             height: 52px;
+            width: 100%;
+            height: 100%;
             border: 1px solid var(--border);
             background: white;
             display: flex;
@@ -47,8 +54,9 @@
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
-            box-shadow: 1px 1px 3px rgba(0,0,0,0.03);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
             user-select: none;
+            border-radius: 8px;
         }
 
         /* Wallpaper Engine Scale Effect */
@@ -62,10 +70,6 @@
 
         .symbol { font-weight: 500; font-size: 15px; color: var(--primary); }
         .number { font-size: 8px; position: absolute; top: 4px; left: 4px; color: #bbb; }
-
-        /* Family Accent Styling */
-        .goddess { border-top: 3px solid var(--primary); }
-        .noble { border-top: 3px solid #c9184a; }
 
         /* Reveal Overlay */
         #reveal-overlay {
@@ -283,7 +287,7 @@ const manualElements = [
                 // Alignment Fix for Lanthanides/Actinides (Rows 9 & 10)
                 if (r >= 9) {
                     div.style.gridRow = r;
-                    div.style.gridColumn = c + 3; // Aligning under column 4 (Transition Metals)
+                    div.style.gridColumn = c + 2; // Center the 15-element rows within the 18-column grid
                     if (c > 15) continue; // Bottom rows only have 15 elements
                 } else {
                     div.style.gridRow = elData[0];
