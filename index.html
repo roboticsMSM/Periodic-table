@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Advanced Inorganic Chemistry Study Guide</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500&display=swap" rel="stylesheet">
     <style>
@@ -17,15 +17,20 @@
         body {
             background: var(--bg);
             font-family: 'Quicksand', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
             margin: 0;
-            overflow-x: hidden;
-            padding: 20px;
-            overflow: hidden;
             padding: 0;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #table-container {
+            width: 100%;
+            height: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+            display: flex;
+            align-items: center;
         }
 
         /* 18-column Periodic Grid */
@@ -38,6 +43,8 @@
             grid-template-rows: repeat(10, min(5vw, 8.5vh));
             grid-gap: min(0.5vw, 0.8vh);
             transition: filter 0.5s ease;
+            margin: auto;
+            flex-shrink: 0;
         }
 
         .element {
@@ -101,15 +108,9 @@
 
         /* Mobile Scaling */
         @media (max-width: 800px) {
-            body {
-                display: flex;
-                align-items: center;
+            #table-container {
                 justify-content: flex-start;
-                width: 100vw;
-                height: 100vh;
-                overflow-x: auto;
-                overflow-y: hidden;
-                padding: 0;
+                padding: 0 20px;
             }
 
             #periodic-table {
@@ -117,8 +118,7 @@
                 grid-template-columns: repeat(18, 42px);
                 grid-template-rows: repeat(10, 42px);
                 grid-gap: 4px;
-                min-width: max-content;
-                margin: 0 20px;
+                margin: 0;
                 transform: none;
             }
 
@@ -135,7 +135,9 @@
 </head>
 <body>
 
-<div id="periodic-table"></div>
+<div id="table-container">
+    <div id="periodic-table"></div>
+</div>
 
 <div id="reveal-overlay" onclick="hideReveal()">
     <div id="reveal-content">
