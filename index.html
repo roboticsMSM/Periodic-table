@@ -102,10 +102,14 @@
         /* Mobile Scaling */
         @media (max-width: 800px) {
             body {
-                display: block;
-                overflow: auto;
-                padding: 20px;
-                min-height: initial; /* Removes the large vertical gap on mobile */
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+                width: 100vw;
+                height: 100vh;
+                overflow-x: auto;
+                overflow-y: hidden;
+                padding: 0;
             }
 
             #periodic-table {
@@ -113,8 +117,8 @@
                 grid-template-columns: repeat(18, 42px);
                 grid-template-rows: repeat(10, 42px);
                 grid-gap: 4px;
-                width: max-content;
-                margin: 0 auto;
+                min-width: max-content;
+                margin: 0 20px;
                 transform: none;
             }
 
