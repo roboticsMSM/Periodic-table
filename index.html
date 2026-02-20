@@ -100,8 +100,37 @@
         .close-msg { margin-top: 30px; font-size: 12px; color: #ccc; letter-spacing: 1px; }
 
         /* Mobile Scaling */
-        @media (max-width: 1100px) {
-            #periodic-table { transform: scale(0.7); }
+        @media (max-width: 800px) {
+            body {
+                overflow-y: auto;
+                height: auto;
+                align-items: flex-start;
+                padding: 40px 10px;
+            }
+
+            #periodic-table {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 8px;
+                transform: none;
+            }
+
+            .element {
+                width: 65px;
+                height: 65px;
+                grid-column: auto !important;
+                grid-row: auto !important;
+            }
+
+            /* Hide empty placeholder slots on mobile to save space */
+            .element.none {
+                display: none;
+            }
+
+            #reveal-symbol { font-size: 80px !important; }
+            h2 { font-size: 28px; }
+            p { font-size: 16px; padding: 0 15px; }
         }
     </style>
 </head>
